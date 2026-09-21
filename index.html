@@ -91,7 +91,7 @@
 
 <body>
 <main>
-  <p>This is <b>Scoot</b>, an orange tabby with megacolon, kept healthy by regular <span class="chip">laser treatments</span>. Look after him here. Skip the zaps and he'll back up, and then, well, he'll need an <b>enema</b>.</p>
+  <p>This is <b>Scoot</b>, an orange tabby with megacolon, kept healthy by regular <span class="chip">laser treatments</span>. If he misses treatments, he'll get constipated and need an <b>enema</b>.</p>
 
   <div class="slot">
 <!-- =====================================================================
@@ -148,10 +148,10 @@
   const LASER_COOLDOWN  = 6000;    // ms between treatments
   const ENEMA_RESET     = 55;      // gut level after an enema
   const SKIP_PENALTY    = 40;      // gut points lost by "skip a day"
-  const STORE           = 'scoot-tamagotchi-v1';
+  const STORE           = 'scoot-tamagotchi-v2';
 
   /* ---------- state ---------- */
-  const fresh = () => ({ gut: 85, last: Date.now(), lasers: 0, enemas: 0, born: Date.now(), lastLaser: 0, sound: false });
+  const fresh = () => ({ gut: 85, last: Date.now(), lasers: 0, enemas: 0, born: Date.now(), lastLaser: 0, sound: true });
   const load = () => { try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(STORE)) || {}); } catch (e) { return fresh(); } };
   let s = load();
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} };
