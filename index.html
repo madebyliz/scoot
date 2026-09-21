@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scoot-a-gotchi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  /* ---------- demo page (mimics a quiet portfolio column; not part of the widget) ---------- */
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fcfcfc; color: #9a9a9a; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; }
+  main { max-width: 680px; margin: 0 auto; padding: 88px 24px 140px; }
+  main p { margin: 0 0 28px; }
+  main b { color: #222; font-weight: 600; }
+  .chip { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 17px; line-height: 1.4; color: #3b5bdb; background: #f3f6ff; border: 1px solid #b8c6f5; border-radius: 8px; padding: 0 10px; }
+  .slot { display: flex; justify-content: center; margin: 64px 0; }
+</style>
+
+<style>
+/* =====================================================================
+   SCOOT-A-GOTCHI  ·  drop-in widget  (CSS)   — everything is scoped to .scoot
+   ===================================================================== */
+.scoot { zoom:1.45; --shell:#f0964a; --shell-hi:#ffc48a; --shell-lo:#c9652a; --lcd:#d8e3b5; --lcd-ink:#34441c;
+  display:flex; flex-direction:column; align-items:center; gap:16px; font-family:"Silkscreen", ui-monospace, monospace; -webkit-tap-highlight-color:transparent; }
+.scoot *, .scoot *::before, .scoot *::after { box-sizing:border-box; }
+
+.scoot-device { position:relative; isolation:isolate; width:320px; height:480px; padding-top:58px;
+  display:flex; flex-direction:column; align-items:center;
+  border-radius:50% 50% 46% 46% / 56% 56% 44% 44%;
+  background: radial-gradient(120% 90% at 30% 15%, var(--shell-hi) 0%, var(--shell) 45%, var(--shell-lo) 100%);
+  box-shadow: inset 0 -12px 20px rgba(120,45,10,.35), inset 0 8px 14px rgba(255,255,255,.45),
+              0 28px 40px -14px rgba(120,60,20,.45), 0 4px 8px rgba(0,0,0,.12);
+  transition: transform .2s; }
+.scoot-device.shake { animation: scoot-shake .35s 2; }
+@keyframes scoot-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px) rotate(-1deg)} 75%{transform:translateX(3px) rotate(1deg)} }
+
+.scoot-ring { position:absolute; z-index:-1; top:-20px; left:50%; width:30px; height:30px; margin-left:-15px;
+  border:5px solid #cfd2d6; border-radius:50%; box-shadow: inset 0 1px 1px #fff, 0 2px 3px rgba(0,0,0,.2); }
+/* tabby forehead stripes on the shell */
+.scoot-stripes { position:absolute; top:14px; left:50%; display:flex; gap:14px; transform:translateX(-50%); pointer-events:none; }
+.scoot-stripes i { width:9px; height:24px; border-radius:6px; background:rgba(150,60,15,.32); }
+.scoot-stripes i:nth-child(2) { height:30px; }
+.scoot-brand { margin-top:2px; margin-bottom:8px; font-size:9px; letter-spacing:.14em; color:rgba(110,40,5,.75); text-shadow:0 1px 0 rgba(255,255,255,.35); text-transform:uppercase; }
+
+.scoot-bezel { width:224px; padding:10px; border-radius:22px;
+  background:linear-gradient(#f9f3e6,#e3d9c3); box-shadow: inset 0 2px 4px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.55); }
+.scoot-lcd { position:relative; width:204px; overflow:hidden; border-radius:10px; background:var(--lcd); color:var(--lcd-ink);
+  box-shadow: inset 0 2px 8px rgba(40,60,10,.5); }
+.scoot-lcd::after { content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(52,68,28,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(52,68,28,.09) 1px, transparent 1px);
+  background-size:5px 5px; }
+.scoot-top { display:flex; align-items:center; justify-content:space-between; height:24px; padding:0 8px; font-size:9px; }
+.scoot-pips { display:flex; gap:2px; }
+.scoot-pips i { width:8px; height:9px; border:1px solid var(--lcd-ink); opacity:.3; }
+.scoot-pips i.on { background:var(--lcd-ink); opacity:1; }
+.scoot-pips.crit i.on { animation:scoot-blink .6s steps(2) infinite; }
+@keyframes scoot-blink { 50% { opacity:.2; } }
+.scoot-laser { display:flex; align-items:center; gap:4px; }
+.scoot-laser b { width:8px; height:8px; background:var(--lcd-ink); display:inline-block; }
+.scoot-laser.cool b { background:transparent; border:1px solid var(--lcd-ink); }
+.scoot-lcd canvas { display:block; width:204px; height:163px; image-rendering:pixelated; margin:0 auto; }
+.scoot-msg { height:26px; display:flex; align-items:center; justify-content:center; font-size:9px; letter-spacing:.04em; text-transform:lowercase; text-align:center; padding:0 6px; }
+
+.scoot-buttons { display:flex; gap:22px; align-items:flex-start; margin-top:22px; }
+.scoot-btn { all:unset; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; }
+.scoot-btn:nth-child(2) { margin-top:12px; }
+.scoot-btn i { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; color:#a4501a;
+  background:radial-gradient(circle at 35% 30%, #fffaf0, #f3dcbb 70%);
+  box-shadow:0 4px 0 #a9541f, 0 7px 10px rgba(0,0,0,.28), inset 0 1px 1px #fff; transition:transform .08s, box-shadow .08s; }
+.scoot-btn:active i { transform:translateY(3px); box-shadow:0 1px 0 #a9541f, 0 2px 4px rgba(0,0,0,.25), inset 0 1px 1px #fff; }
+.scoot-btn:focus-visible i { outline:2px solid #3b5bdb; outline-offset:3px; }
+.scoot-btn svg { width:20px; height:20px; }
+.scoot-btn span { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:rgba(100,35,5,.85); }
+.scoot-btn.needed i { animation:scoot-pulse 1s ease-in-out infinite; }
+@keyframes scoot-pulse { 50% { box-shadow:0 4px 0 #a9541f, 0 0 0 7px rgba(255,255,255,.55), inset 0 1px 1px #fff; } }
+
+.scoot-meta { display:flex; align-items:center; gap:14px; font:12px/1 -apple-system,"Inter",system-ui,sans-serif; color:#9a9a9a; }
+.scoot-meta button { all:unset; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-color:#d8d8d8; }
+.scoot-meta button:hover { color:#444; }
+.scoot-meta button:focus-visible { outline:2px solid #3b5bdb; outline-offset:2px; }
+.scoot-meta .stats { font-family:"Caveat",cursive; font-size:17px; color:#8a8a8a; }
+.scoot-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+@media (prefers-reduced-motion: reduce) { .scoot-btn.needed i, .scoot-pips.crit i.on, .scoot-device.shake { animation:none; } }
+</style>
+</head>
+
+<body>
+<main>
+  <p>This is <b>Scoot</b>, an orange tabby with megacolon, kept healthy by regular <span class="chip">laser treatments</span>. Look after him here. Skip the zaps and he'll back up, and then, well, he'll need an <b>enema</b>.</p>
+
+  <div class="slot">
+<!-- =====================================================================
+     SCOOT-A-GOTCHI  ·  drop-in widget  (HTML)
+     ===================================================================== -->
+<section class="scoot" aria-label="Scoot, a virtual pet cat">
+  <div class="scoot-device" id="scootDevice">
+    <div class="scoot-ring"></div>
+    <div class="scoot-stripes"><i></i><i></i><i></i></div>
+    <div class="scoot-brand">scoot·a·gotchi</div>
+    <div class="scoot-bezel">
+      <div class="scoot-lcd">
+        <div class="scoot-top">
+          <div class="scoot-pips" id="scootPips" aria-hidden="true"></div>
+          <div class="scoot-laser" id="scootLaser" aria-hidden="true">laser <b></b></div>
+        </div>
+        <canvas id="scootCanvas" width="40" height="32" aria-hidden="true"></canvas>
+        <div class="scoot-msg" id="scootMsg" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="scoot-buttons">
+      <button class="scoot-btn" data-act="laser" aria-label="Give Scoot a laser treatment">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg></i><span>laser</span>
+      </button>
+      <button class="scoot-btn" data-act="pet" aria-label="Pet Scoot">
+        <i><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></i><span>pet</span>
+      </button>
+      <button class="scoot-btn" data-act="enema" aria-label="Give Scoot an enema">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l4-4M14 4l6 6M12 6l6 6-7 7-6-6zM17 3l4 4"/></svg></i><span>enema</span>
+      </button>
+    </div>
+  </div>
+  <div class="scoot-meta">
+    <span class="stats" id="scootStats"></span>
+    <button id="scootSkip" type="button">skip a day</button>
+    <button id="scootSnd" type="button" aria-pressed="false">sound off</button>
+  </div>
+  <div class="scoot-sr" id="scootSr" role="status" aria-live="polite"></div>
+</section>
+  </div>
+
+  <p>Not medical advice. Scoot is doing great in real life.</p>
+</main>
+
+<script>
+/* =====================================================================
+   SCOOT-A-GOTCHI  ·  drop-in widget  (JS)
+   Tweak the numbers below to change how demanding Scoot is.
+   ===================================================================== */
+(() => {
+  const DECAY_MINUTES   = 12;      // real minutes for a full gut to empty out (set to 60*24 for a slow, real Tamagotchi)
+  const LASER_GAIN      = 30;      // gut points restored per laser treatment (0-100)
+  const LASER_COOLDOWN  = 6000;    // ms between treatments
+  const ENEMA_RESET     = 55;      // gut level after an enema
+  const SKIP_PENALTY    = 40;      // gut points lost by "skip a day"
+  const STORE           = 'scoot-tamagotchi-v1';
+
+  /* ---------- state ---------- */
+  const fresh = () => ({ gut: 85, last: Date.now(), lasers: 0, enemas: 0, born: Date.now(), lastLaser: 0, sound: false });
+  const load = () => { try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(STORE)) || {}); } catch (e) { return fresh(); } };
+  let s = load();
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} };
+  const settle = () => { const t = Date.now(); s.gut = Math.max(0, Math.min(100, s.gut - Math.max(0, t - s.last) / 60000 * (100 / DECAY_MINUTES))); s.last = t; };
+
+  const mood = () => s.gut <= 0 ? 'blocked' : s.gut < 25 ? 'low' : s.gut < 60 ? 'ok' : 'great';
+  const MSG = {
+    great:   ['gut: thriving', 'purring…', 'zoomies soon'],
+    ok:      ['a bit gurgly', 'due a zap soon', 'meh.'],
+    low:     ['tummy rumbles…', 'needs laser!', 'getting stiff'],
+    blocked: ['backed up…', 'needs an enema', 'sad orange loaf'],
+  };
+
+  /* ---------- dom ---------- */
+  const $ = id => document.getElementById(id);
+  const cv = $('scootCanvas'), g = cv.getContext('2d');
+  const dev = $('scootDevice'), msgEl = $('scootMsg'), pipsEl = $('scootPips'), laserEl = $('scootLaser');
+  const statsEl = $('scootStats'), srEl = $('scootSr'), sndBtn = $('scootSnd');
+  const btns = {}; document.querySelectorAll('.scoot-btn').forEach(b => btns[b.dataset.act] = b);
+  const PIPS = 8; for (let i = 0; i < PIPS; i++) pipsEl.appendChild(document.createElement('i'));
+
+  /* ---------- pixel helpers (canvas is 40x32 "LCD pixels") ---------- */
+  const C = { o:'#e9893b', od:'#b4561d', w:'#fff4dc', ink:'#2a2418', pink:'#e98a8f', brown:'#7a4a25', brownd:'#54301a',
+    beam:'#ff3b5c', beamg:'#ffd0d8', blue:'#4aa8e8', green:'#6f9a3a', gray:'#8b8f94', grayd:'#565a60', grayl:'#d5d8dc',
+    yel:'#ffd84a', red:'#d8342c', ground:'#b9c78f', whisk:'#7d8d5c', lump:'#8a5a2c', belly:'#ead9a3' };
+  const px  = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+  const mpx = (x, y, w, h, c) => { px(x, y, w, h, c); px(40 - x - w, y, w, h, c); };   // mirrored about the cat's centre line
+  const rr  = (x, y, w, h, c) => { px(x + 1, y, w - 2, h, c); px(x, y + 1, w, h - 2, c); };
+  const sprite = (rows, x, y, map) => rows.forEach((r, j) => [...r].forEach((ch, i) => { if (map[ch]) px(x + i, y + j, 1, 1, map[ch]); }));
+  const HEART = ['.x.x.', 'xxxxx', '.xxx.', '..x..'], SPARK = ['.x.', 'xxx', '.x.'];
+  const POOP  = ['..b..', '.bbb.', 'bbbbb', 'bdbbb'];
+
+  /* ---------- the cat ---------- */
+  function drawCat(o) {
+    const bl = o.bloat, dx = o.dx || 0, dy = o.dy || 0;
+    g.save(); g.translate(dx, 0);
+    const bx = bl ? 8 : 12, bw = bl ? 24 : 16, by = bl ? 14 : 17, bh = bl ? 15 : 12, tx = bx + bw;
+
+    // tail
+    if (o.tail === 'droop')      { px(tx, 27, 3, 2, C.o); px(tx + 3, 28, 2, 1, C.o); px(tx + 4, 28, 1, 1, C.od); }
+    else if (o.tail === 'up')    { px(tx, 18, 2, 10, C.o); px(tx, 18, 2, 2, C.od); }
+    else if (o.tail === 1)       { px(tx, 26, 2, 2, C.o); px(tx + 2, 24, 2, 3, C.o); px(tx + 3, 20, 2, 4, C.o); px(tx + 3, 20, 2, 1, C.od); }
+    else                         { px(tx, 26, 2, 2, C.o); px(tx + 2, 22, 2, 5, C.o); px(tx + 2, 22, 2, 1, C.od); px(tx + 2, 25, 2, 1, C.od); }
+
+    // body + belly + stripes
+    rr(bx, by, bw, bh, C.o);
+    if (bl) {
+      rr(bx + 4, by + 5, bw - 8, bh - 6, C.belly);
+      px(bx + 7, by + 8, 3, 2, C.lump);  px(bx + 12, by + 9, 3, 3, C.lump); px(bx + 15, by + 6, 2, 2, C.lump); px(bx + 9, by + 11, 2, 2, C.lump);
+    } else rr(16, 20, 8, 8, C.w);
+    [by + 4, by + 7, by + 10].forEach(y => { if (y < by + bh - 1) mpx(bx, y, 2, 1, C.od); });
+    mpx(bx + 4, 28, 4, 2, C.w);   // paws
+
+    // head
+    const hy = 7 + dy;
+    px(13, hy - 3, 1, 1, C.o); px(13, hy - 2, 2, 1, C.o); px(12, hy - 1, 3, 1, C.o);         // left ear (mirrored below)
+    px(26, hy - 3, 1, 1, C.o); px(25, hy - 2, 2, 1, C.o); px(25, hy - 1, 3, 1, C.o);
+    px(13, hy - 1, 1, 1, C.pink); px(26, hy - 1, 1, 1, C.pink);
+    rr(12, hy, 16, 10, C.o);
+    mpx(16, hy, 1, 2, C.od); px(19, hy, 2, 3, C.od); mpx(12, hy + 5, 2, 1, C.od); mpx(12, hy + 7, 2, 1, C.od);
+    rr(17, hy + 6, 6, 4, C.w); px(19, hy + 6, 2, 1, C.pink);
+    mpx(9, hy + 7, 3, 1, C.whisk); mpx(10, hy + 9, 2, 1, C.whisk);
+
+    const ey = hy + 3;
+    switch (o.eyes) {
+      case 'open':  mpx(15, ey, 2, 3, C.ink); mpx(15, ey, 1, 1, C.w); break;
+      case 'line':  mpx(14, ey + 2, 4, 1, C.ink); break;
+      case 'happy': mpx(14, ey + 1, 1, 1, C.ink); mpx(15, ey, 2, 1, C.ink); mpx(17, ey + 1, 1, 1, C.ink); break;
+      case 'sleepy':mpx(15, ey + 1, 2, 2, C.ink); mpx(14, ey, 4, 1, C.od); break;
+      case 'sad':   mpx(15, ey + 1, 2, 2, C.ink); mpx(14, ey - 1, 1, 1, C.ink); mpx(15, ey - 2, 2, 1, C.ink); break;
+      case 'squint':mpx(14, ey, 1, 1, C.ink); mpx(15, ey + 1, 1, 1, C.ink); mpx(14, ey + 2, 1, 1, C.ink); mpx(16, ey + 1, 1, 1, C.ink); break;
+      case 'wide':  mpx(14, ey - 1, 3, 4, C.w); mpx(15, ey + 1, 1, 1, C.ink); break;
+    }
+    const my = hy + 7;
+    switch (o.mouth) {
+      case 'smile': px(18, my, 1, 1, C.ink); px(19, my + 1, 2, 1, C.ink); px(21, my, 1, 1, C.ink); break;
+      case 'frown': px(18, my + 1, 1, 1, C.ink); px(19, my, 2, 1, C.ink); px(21, my + 1, 1, 1, C.ink); break;
+      case 'o':     px(19, my, 2, 2, C.ink); break;
+      default:      px(19, my, 2, 1, C.ink);
+    }
+    if (o.blush) mpx(13, hy + 6, 2, 1, '#f29aa0');
+    if (o.sweat) { px(29, hy + 1 + (o.f ? 1 : 0), 1, 2, C.blue); px(28, hy + 3 + (o.f ? 1 : 0), 3, 1, C.blue); }
+    if (o.anger) { px(29, hy - 2, 3, 1, C.red); px(30, hy - 3, 1, 3, C.red); }
+    g.restore();
+    return { bx, bw, by, bh, hy };
+  }
+
+  /* ---------- fx ---------- */
+  let fx = null;   // {type, t0, dur, msgs:[[ms,text],...]}
+  const play = (type, dur, msgs) => { fx = { type, t0: performance.now(), dur, msgs }; sr(msgs[0][1]); sfx(type); };
+  const sr = t => { srEl.textContent = ''; setTimeout(() => srEl.textContent = t, 30); };
+
+  function render(t) {
+    const m = mood(), f = Math.floor(t / 500) % 2, blink = Math.floor(t / 100) % 40 === 0;
+    const el = fx ? t - fx.t0 : 0;
+    g.clearRect(0, 0, 40, 32);
+    px(0, 30, 40, 2, C.ground);
+
+    let o = { f, tail: f, eyes: 'open', mouth: 'neutral', bloat: false, dx: 0, dy: 0 };
+    if (m === 'great')        { o.eyes = blink ? 'line' : 'open'; o.mouth = 'smile'; o.dy = f; }
+    else if (m === 'ok')      { o.eyes = 'sleepy'; o.tail = 0; }
+    else if (m === 'low')     { o.eyes = 'sad'; o.mouth = 'frown'; o.tail = 'droop'; o.sweat = true; }
+    else                      { o.eyes = 'sad'; o.mouth = 'frown'; o.tail = 'droop'; o.sweat = true; o.bloat = true; o.dx = (Math.floor(t / 250) % 2) * (Math.random() < .3 ? 1 : 0); }
+
+    if (!fx) {
+      const b = drawCat(o);
+      if (m === 'great' && f) sprite(SPARK, 31, 6, { x: C.yel });
+      if (m === 'low' && f)   { px(b.bx - 2, 22, 1, 3, C.green); px(b.bx + b.bw + 1, 21, 1, 3, C.green); }   // rumbling
+      if (m === 'blocked') {   // stink lines
+        const w = Math.floor(t / 300) % 3;
+        [[30, 9], [33, 11], [27, 5]].forEach(([x, y], i) => { px(x, y - ((w + i) % 3), 1, 2, C.green); px(x + 1, y - ((w + i) % 3) - 2, 1, 2, C.green); });
+      }
+      return;
+    }
+
+    const p = Math.min(1, el / fx.dur);
+    if (fx.type === 'laser') {
+      o = { f: f, tail: f, eyes: 'happy', mouth: 'smile', blush: true, bloat: false, dy: 0 };
+      const b = drawCat(o), fl = Math.floor(t / 70) % 2;
+      // handpiece
+      px(0, 21, 6, 4, C.gray); px(0, 21, 6, 1, C.grayl); px(6, 22, 3, 2, C.grayd); px(1, 25, 3, 3, C.grayd);
+      px(4, 22, 1, 2, C.red);
+      // beam
+      const ex = b.bx + 2;
+      px(9, 22, ex - 9, 2, fl ? C.beam : C.beamg); px(9, 21, ex - 9, 1, 'rgba(255,59,92,.35)'); px(9, 24, ex - 9, 1, 'rgba(255,59,92,.35)');
+      px(ex - 1, 20, 3, 6, fl ? C.beamg : C.beam);
+      // sparkles around the belly
+      for (let i = 0; i < 4; i++) { const ph = (t / 260 + i * .9) % 3; if (ph < 2) sprite(SPARK, [17, 23, 15, 25][i], [18, 19, 26, 24][i] - Math.floor(ph * 2), { x: C.yel }); }
+      if (p > .55) sprite(HEART, 24, 1 + Math.round((1 - p) * 4), { x: C.pink });
+    } else if (fx.type === 'pet') {
+      o = { f: Math.floor(t / 150) % 2, tail: Math.floor(t / 150) % 2, eyes: 'happy', mouth: 'smile', blush: true, dy: Math.floor(t / 150) % 2 };
+      drawCat(o);
+      [[9, 0], [17, .35], [26, .7]].forEach(([x, d]) => { const q = (p * 1.4 + d) % 1; sprite(HEART, x, 3 - Math.round(q * 3) + 2 - Math.round(q * 2), { x: C.pink }); });
+    } else if (fx.type === 'nope') {
+      o = { f, tail: 'droop', eyes: 'squint', mouth: 'frown', anger: true, bloat: m === 'blocked', dx: Math.floor(t / 90) % 2 ? 1 : -1 };
+      drawCat(o);
+    } else if (fx.type === 'enema') {
+      const phase = el < 900 ? 0 : el < 2000 ? 1 : 2;
+      if (phase < 2) {
+        o = { f, tail: 'up', eyes: phase ? 'wide' : 'sad', mouth: phase ? 'o' : 'frown', bloat: true, sweat: true, dx: phase ? (Math.floor(t / 60) % 2 ? 1 : 0) : 0 };
+        drawCat(o);
+        // syringe slides in from the right, plunger pushes
+        const slide = phase ? 0 : Math.round((1 - el / 900) * 8), push = phase ? Math.min(3, Math.floor((el - 900) / 350)) : 0;
+        px(33 + slide, 28, 2, 1, C.grayd);                    // needle
+        px(35 + slide, 27, 4, 3, C.grayl); px(35 + slide, 27, 4, 1, C.w);
+        px(35 + slide, 28, 4 - push, 1, C.blue);              // liquid
+        px(39 - push + slide, 28, 1 + push, 1, C.gray);       // plunger
+        if (phase) { px(32, 8, 1, 3, C.red); px(32, 12, 1, 1, C.red); }   // "!"
+      } else {
+        const q = el - 2000;
+        o = { f, tail: f, eyes: 'happy', mouth: 'smile', blush: true, dy: f };
+        drawCat(o);
+        const py = Math.min(24, 14 + Math.floor(q / 60));      // plop falls behind the cat
+        if (q > 0) sprite(POOP, 33, py, { b: C.brown, d: C.brownd });
+        if (q > 500) { const w = Math.floor(t / 300) % 2; px(34, 21 - w, 1, 2, C.green); px(36, 22 - w, 1, 2, C.green); }
+        sprite(HEART, 24, 1 + Math.round(Math.max(0, 1 - q / 800) * 4), { x: C.pink });
+        sprite(SPARK, 7, 8, { x: C.yel }); if (f) sprite(SPARK, 6, 15, { x: C.yel });
+      }
+    }
+  }
+
+  /* ---------- ui sync ---------- */
+  let lastMsg = '';
+  function ui(t) {
+    const on = Math.ceil(s.gut / (100 / PIPS));
+    [...pipsEl.children].forEach((p, i) => p.classList.toggle('on', i < on));
+    pipsEl.classList.toggle('crit', on <= 2);
+    const cool = Date.now() - s.lastLaser < LASER_COOLDOWN;
+    laserEl.classList.toggle('cool', cool);
+    btns.enema.classList.toggle('needed', mood() === 'blocked');
+    btns.laser.classList.toggle('needed', mood() === 'low');
+    let msg;
+    if (fx) { const el = t - fx.t0; msg = fx.msgs.filter(([ms]) => ms <= el).pop()[1]; }
+    else { const l = MSG[mood()]; msg = l[Math.floor(t / 5000) % l.length]; }
+    if (msg !== lastMsg) { msgEl.textContent = msg; lastMsg = msg; }
+    const days = Math.max(1, Math.ceil((Date.now() - s.born) / 864e5));
+    statsEl.textContent = `day ${days} · ${s.lasers} zap${s.lasers === 1 ? '' : 's'} · ${s.enemas} enema${s.enemas === 1 ? '' : 's'}`;
+    sndBtn.textContent = s.sound ? 'sound on' : 'sound off'; sndBtn.setAttribute('aria-pressed', s.sound);
+  }
+
+  /* ---------- actions ---------- */
+  function act(kind) {
+    settle();
+    const t = Date.now(), busy = fx && performance.now() < fx.t0 + fx.dur;
+    if (busy) return;
+    const nope = (text, dur = 1400) => { play('nope', dur, [[0, text]]); dev.classList.remove('shake'); void dev.offsetWidth; dev.classList.add('shake'); };
+    if (kind === 'laser') {
+      if (s.gut <= 0)                    return nope('too backed up! enema', 1800);
+      if (t - s.lastLaser < LASER_COOLDOWN) return nope('laser recharging…');
+      if (s.gut >= 95)                   return nope('already glowing!');
+      s.lastLaser = t; s.lasers++; s.gut = Math.min(100, s.gut + LASER_GAIN);
+      play('laser', 2600, [[0, 'zzzap… ahh'], [1300, 'good kitty']]);
+    } else if (kind === 'pet') {
+      if (s.gut <= 0) return nope('ugh… not now', 1500);
+      play('pet', 1800, [[0, 'purrrrr']]);
+    } else if (kind === 'enema') {
+      if (s.gut > 0) return nope("he's fine! no enema");
+      s.gut = ENEMA_RESET; s.enemas++;
+      play('enema', 3800, [[0, 'hold still buddy…'], [900, '!!!'], [2000, 'plop. relief.'], [3000, 'much better']]);
+    }
+    s.last = Date.now(); save(); ui(performance.now());
+  }
+  document.querySelectorAll('.scoot-btn').forEach(b => b.addEventListener('click', () => { act(b.dataset.act); }));
+  $('scootSkip').addEventListener('click', () => { settle(); s.gut = Math.max(0, s.gut - SKIP_PENALTY); save(); sr('a day passes'); });
+  sndBtn.addEventListener('click', () => { s.sound = !s.sound; save(); if (s.sound) sfx('pet'); });
+
+  /* ---------- tiny 8-bit sound ---------- */
+  let ac;
+  function beep(freq, dur, at = 0, type = 'square', vol = .05, slideTo) {
+    const c = ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = c.createOscillator(), v = c.createGain(), t0 = c.currentTime + at;
+    o.type = type; o.frequency.setValueAtTime(freq, t0); if (slideTo) o.frequency.linearRampToValueAtTime(slideTo, t0 + dur);
+    v.gain.setValueAtTime(vol, t0); v.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(v).connect(c.destination); o.start(t0); o.stop(t0 + dur + .02);
+  }
+  function sfx(kind) {
+    if (!s.sound) return;
+    try {
+      if (kind === 'laser') { beep(300, .9, 0, 'sawtooth', .04, 1400); beep(880, .12, 1.0); beep(1175, .2, 1.15); }
+      else if (kind === 'pet') { beep(660, .1); beep(880, .16, .1); }
+      else if (kind === 'nope') { beep(220, .16, 0, 'square', .05, 160); beep(160, .2, .18); }
+      else if (kind === 'enema') { beep(200, .5, 0, 'triangle', .07, 120); beep(120, .3, .9, 'sawtooth', .05); beep(90, .25, 2.0, 'triangle', .1, 60); beep(660, .12, 2.6); beep(990, .2, 2.75); }
+    } catch (e) {}
+  }
+
+  /* ---------- loop ---------- */
+  let lastSave = 0;
+  (function tick() {
+    const t = performance.now();
+    settle();
+    if (fx && t > fx.t0 + fx.dur) fx = null;
+    render(t); ui(t);
+    if (t - lastSave > 5000) { save(); lastSave = t; }
+    setTimeout(tick, 100);
+  })();
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+  window.addEventListener('pagehide', save);
+})();
+</script>
+</body>
+</html>
