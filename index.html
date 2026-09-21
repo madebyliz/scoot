@@ -6,16 +6,16 @@
 <title>Scoot-a-gotchi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
 <style>
   /* ---------- demo page (mimics a quiet portfolio column; not part of the widget) ---------- */
-  :root { color-scheme: light; }
+  :root { color-scheme: dark; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #fcfcfc; color: #9a9a9a; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; }
+  body { margin: 0; background: #141414; color: #f2f2f2; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; }
   main { max-width: 680px; margin: 0 auto; padding: 88px 24px 140px; }
   main p { margin: 0 0 28px; }
-  main b { color: #222; font-weight: 600; }
-  .chip { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 17px; line-height: 1.4; color: #3b5bdb; background: #f3f6ff; border: 1px solid #b8c6f5; border-radius: 8px; padding: 0 10px; }
+  main b { color: #f2f2f2; font-weight: 700; }
+  .chip { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 17px; line-height: 1.4; color: #f0964a; background: rgba(240,150,74,.12); border: 1px solid rgba(240,150,74,.45); border-radius: 8px; padding: 0 10px; }
   .slot { display: flex; justify-content: center; margin: 64px 0; }
 </style>
 
@@ -27,7 +27,7 @@
   display:flex; flex-direction:column; align-items:center; gap:16px; font-family:"Silkscreen", ui-monospace, monospace; -webkit-tap-highlight-color:transparent; }
 .scoot *, .scoot *::before, .scoot *::after { box-sizing:border-box; }
 
-.scoot-device { position:relative; isolation:isolate; width:320px; height:480px; padding-top:58px;
+.scoot-device { position:relative; isolation:isolate; width:320px; height:436px; padding-top:56px;
   display:flex; flex-direction:column; align-items:center;
   border-radius:50% 50% 46% 46% / 56% 56% 44% 44%;
   background: radial-gradient(120% 90% at 30% 15%, var(--shell-hi) 0%, var(--shell) 45%, var(--shell-lo) 100%);
@@ -37,13 +37,15 @@
 .scoot-device.shake { animation: scoot-shake .35s 2; }
 @keyframes scoot-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px) rotate(-1deg)} 75%{transform:translateX(3px) rotate(1deg)} }
 
+.scoot-skin { position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 480' preserveAspectRatio='none'%3E%3Cg fill='%238c3a0c' fill-opacity='.17'%3E%3Cpath d='M0 120 C28 114 56 118 70 128 C49 132 24 134 0 140ZM0 175 C36 169 72 173 90 183 C63 187 31 189 0 195ZM0 230 C32 224 64 228 80 238 C56 242 28 244 0 250ZM0 285 C38 279 76 283 95 293 C66 297 33 299 0 305ZM0 340 C32 334 64 338 80 348 C56 352 28 354 0 360ZM0 395 C26 389 52 393 65 403 C46 407 23 409 0 415Z'/%3E%3Cpath transform='translate(320 0) scale(-1 1)' d='M0 120 C28 114 56 118 70 128 C49 132 24 134 0 140ZM0 175 C36 169 72 173 90 183 C63 187 31 189 0 195ZM0 230 C32 224 64 228 80 238 C56 242 28 244 0 250ZM0 285 C38 279 76 283 95 293 C66 297 33 299 0 305ZM0 340 C32 334 64 338 80 348 C56 352 28 354 0 360ZM0 395 C26 389 52 393 65 403 C46 407 23 409 0 415Z'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat; }
 .scoot-ring { position:absolute; z-index:-1; top:-20px; left:50%; width:30px; height:30px; margin-left:-15px;
   border:5px solid #cfd2d6; border-radius:50%; box-shadow: inset 0 1px 1px #fff, 0 2px 3px rgba(0,0,0,.2); }
 /* tabby forehead stripes on the shell */
 .scoot-stripes { position:absolute; top:14px; left:50%; display:flex; gap:14px; transform:translateX(-50%); pointer-events:none; }
 .scoot-stripes i { width:9px; height:24px; border-radius:6px; background:rgba(150,60,15,.32); }
 .scoot-stripes i:nth-child(2) { height:30px; }
-.scoot-brand { margin-top:2px; margin-bottom:8px; font-size:9px; letter-spacing:.14em; color:rgba(110,40,5,.75); text-shadow:0 1px 0 rgba(255,255,255,.35); text-transform:uppercase; }
+.scoot-brand { margin-top:0; margin-bottom:8px; font:700 16px/1 "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#8f3a0d; text-shadow:0 1px 0 rgba(255,255,255,.5); }
 
 .scoot-bezel { width:224px; padding:10px; border-radius:22px;
   background:linear-gradient(#f9f3e6,#e3d9c3); box-shadow: inset 0 2px 4px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.55); }
@@ -71,17 +73,17 @@
   background:radial-gradient(circle at 35% 30%, #fffaf0, #f3dcbb 70%);
   box-shadow:0 4px 0 #a9541f, 0 7px 10px rgba(0,0,0,.28), inset 0 1px 1px #fff; transition:transform .08s, box-shadow .08s; }
 .scoot-btn:active i { transform:translateY(3px); box-shadow:0 1px 0 #a9541f, 0 2px 4px rgba(0,0,0,.25), inset 0 1px 1px #fff; }
-.scoot-btn:focus-visible i { outline:2px solid #3b5bdb; outline-offset:3px; }
+.scoot-btn:focus-visible i { outline:2px solid #f2f2f2; outline-offset:3px; }
 .scoot-btn svg { width:20px; height:20px; }
 .scoot-btn span { font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:rgba(100,35,5,.85); }
 .scoot-btn.needed i { animation:scoot-pulse 1s ease-in-out infinite; }
 @keyframes scoot-pulse { 50% { box-shadow:0 4px 0 #a9541f, 0 0 0 7px rgba(255,255,255,.55), inset 0 1px 1px #fff; } }
 
-.scoot-meta { display:flex; align-items:center; gap:14px; font:12px/1 -apple-system,"Inter",system-ui,sans-serif; color:#9a9a9a; }
-.scoot-meta button { all:unset; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-color:#d8d8d8; }
-.scoot-meta button:hover { color:#444; }
-.scoot-meta button:focus-visible { outline:2px solid #3b5bdb; outline-offset:2px; }
-.scoot-meta .stats { font-family:"Caveat",cursive; font-size:17px; color:#8a8a8a; }
+.scoot-meta { display:flex; align-items:center; gap:14px; margin-top:22px; font:12px/1 -apple-system,"Inter",system-ui,sans-serif; color:#9a9a9a; }
+.scoot-meta button { all:unset; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-color:#555; }
+.scoot-meta button:hover { color:#f2f2f2; }
+.scoot-meta button:focus-visible { outline:2px solid #f2f2f2; outline-offset:2px; }
+.scoot-meta .stats { font:12px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace; letter-spacing:.08em; text-transform:uppercase; color:#f0964a; background:rgba(240,150,74,.12); border:1px solid rgba(240,150,74,.45); border-radius:8px; padding:7px 11px; }
 .scoot-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 @media (prefers-reduced-motion: reduce) { .scoot-btn.needed i, .scoot-pips.crit i.on, .scoot-device.shake { animation:none; } }
 </style>
@@ -97,9 +99,10 @@
      ===================================================================== -->
 <section class="scoot" aria-label="Scoot, a virtual pet cat">
   <div class="scoot-device" id="scootDevice">
+    <div class="scoot-skin"></div>
     <div class="scoot-ring"></div>
     <div class="scoot-stripes"><i></i><i></i><i></i></div>
-    <div class="scoot-brand">scoot·a·gotchi</div>
+    <div class="scoot-brand">Scoot-a-gotchi</div>
     <div class="scoot-bezel">
       <div class="scoot-lcd">
         <div class="scoot-top">
