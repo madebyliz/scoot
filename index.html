@@ -6,17 +6,18 @@
 <title>Scoot-a-gotchi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Fredoka:wght@600;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
 <style>
   /* ---------- demo page (mimics a quiet portfolio column; not part of the widget) ---------- */
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   body { margin: 0; background: #141414; color: #f2f2f2; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; }
   main { max-width: 680px; margin: 0 auto; padding: 88px 24px 140px; }
-  main p { margin: 0 0 28px; }
+  main p { margin: 0 0 28px; font-size: 16px; text-align: center; }
   main b { color: #f2f2f2; font-weight: 700; }
-  .chip { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 17px; line-height: 1.4; color: #f0964a; background: rgba(240,150,74,.12); border: 1px solid rgba(240,150,74,.45); border-radius: 8px; padding: 0 10px; }
+  .hl { font-weight: 700; text-decoration: underline; text-decoration-color: #f0964a; text-decoration-thickness: 2px; text-underline-offset: 4px; }
   .slot { display: flex; justify-content: center; margin: 64px 0; }
+  .studio { margin: 40px 0 0; text-align: center; font-family: "Oswald", "Arial Narrow", sans-serif; font-weight: 600; font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: #ffffff; }
 </style>
 
 <style>
@@ -83,7 +84,8 @@
 .scoot-meta button { all:unset; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-color:#555; }
 .scoot-meta button:hover { color:#f2f2f2; }
 .scoot-meta button:focus-visible { outline:2px solid #f2f2f2; outline-offset:2px; }
-.scoot-meta .stats { font:12px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace; letter-spacing:.08em; text-transform:uppercase; color:#f0964a; background:rgba(240,150,74,.12); border:1px solid rgba(240,150,74,.45); border-radius:8px; padding:7px 11px; }
+.scoot-stats { display:flex; gap:8px; }
+.scoot-stats span { font:9px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace; letter-spacing:.06em; text-transform:uppercase; color:#f0964a; background:rgba(240,150,74,.12); border:1px solid rgba(240,150,74,.45); border-radius:7px; padding:6px 9px; }
 .scoot-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 @media (prefers-reduced-motion: reduce) { .scoot-btn.needed i, .scoot-pips.crit i.on, .scoot-device.shake { animation:none; } }
 </style>
@@ -91,7 +93,7 @@
 
 <body>
 <main>
-  <p>This is <b>Scoot</b>, an orange tabby with megacolon, kept healthy by regular <span class="chip">laser treatments</span>. If he misses treatments, he'll get constipated and need an <b>enema</b>.</p>
+  <p>This is <b>Scoot</b>, an orange tabby with megacolon, kept healthy by regular <span class="hl">laser treatments</span>. If he misses treatments, he'll get constipated and need an <span class="hl">enema</span>.</p>
 
   <div class="slot">
 <!-- =====================================================================
@@ -126,7 +128,9 @@
     </div>
   </div>
   <div class="scoot-meta">
-    <span class="stats" id="scootStats"></span>
+    <div class="scoot-stats" id="scootStats">
+      <span id="statDay"></span><span id="statZaps"></span><span id="statEnemas"></span>
+    </div>
     <button id="scootSkip" type="button">skip a day</button>
     <button id="scootSnd" type="button" aria-pressed="false">sound off</button>
   </div>
@@ -135,6 +139,8 @@
   </div>
 
   <p>Not medical advice. Scoot is doing great in real life.</p>
+
+  <p class="studio">Made by Liz</p>
 </main>
 
 <script>
@@ -169,7 +175,7 @@
   const $ = id => document.getElementById(id);
   const cv = $('scootCanvas'), g = cv.getContext('2d');
   const dev = $('scootDevice'), msgEl = $('scootMsg'), pipsEl = $('scootPips'), laserEl = $('scootLaser');
-  const statsEl = $('scootStats'), srEl = $('scootSr'), sndBtn = $('scootSnd');
+  const statDay = $('statDay'), statZaps = $('statZaps'), statEnemas = $('statEnemas'), srEl = $('scootSr'), sndBtn = $('scootSnd');
   const btns = {}; document.querySelectorAll('.scoot-btn').forEach(b => btns[b.dataset.act] = b);
   const PIPS = 8; for (let i = 0; i < PIPS; i++) pipsEl.appendChild(document.createElement('i'));
 
@@ -328,7 +334,9 @@
     else { const l = MSG[mood()]; msg = l[Math.floor(t / 5000) % l.length]; }
     if (msg !== lastMsg) { msgEl.textContent = msg; lastMsg = msg; }
     const days = Math.max(1, Math.ceil((Date.now() - s.born) / 864e5));
-    statsEl.textContent = `day ${days} · ${s.lasers} zap${s.lasers === 1 ? '' : 's'} · ${s.enemas} enema${s.enemas === 1 ? '' : 's'}`;
+    statDay.textContent = `day ${days}`;
+    statZaps.textContent = `${s.lasers} zap${s.lasers === 1 ? '' : 's'}`;
+    statEnemas.textContent = `${s.enemas} enema${s.enemas === 1 ? '' : 's'}`;
     sndBtn.textContent = s.sound ? 'sound on' : 'sound off'; sndBtn.setAttribute('aria-pressed', s.sound);
   }
 
