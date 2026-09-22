@@ -40,6 +40,10 @@
 
 .scoot-skin { position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 480' preserveAspectRatio='none'%3E%3Cg fill='%238c3a0c' fill-opacity='.17'%3E%3Cpath d='M0 120 C28 114 56 118 70 128 C49 132 24 134 0 140ZM0 175 C36 169 72 173 90 183 C63 187 31 189 0 195ZM0 230 C32 224 64 228 80 238 C56 242 28 244 0 250ZM0 285 C38 279 76 283 95 293 C66 297 33 299 0 305ZM0 340 C32 334 64 338 80 348 C56 352 28 354 0 360ZM0 395 C26 389 52 393 65 403 C46 407 23 409 0 415Z'/%3E%3Cpath transform='translate(320 0) scale(-1 1)' d='M0 120 C28 114 56 118 70 128 C49 132 24 134 0 140ZM0 175 C36 169 72 173 90 183 C63 187 31 189 0 195ZM0 230 C32 224 64 228 80 238 C56 242 28 244 0 250ZM0 285 C38 279 76 283 95 293 C66 297 33 299 0 305ZM0 340 C32 334 64 338 80 348 C56 352 28 354 0 360ZM0 395 C26 389 52 393 65 403 C46 407 23 409 0 415Z'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat; }
+/* glossy plastic sheen, like light catching a curved shell */
+.scoot-gloss { position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none; mix-blend-mode:screen;
+  background: radial-gradient(55% 34% at 27% 10%, rgba(255,255,255,.65), rgba(255,255,255,0) 72%),
+              radial-gradient(30% 16% at 74% 82%, rgba(255,255,255,.18), rgba(255,255,255,0) 75%); }
 .scoot-ring { position:absolute; z-index:-1; top:-20px; left:50%; width:30px; height:30px; margin-left:-15px;
   border:5px solid #cfd2d6; border-radius:50%; box-shadow: inset 0 1px 1px #fff, 0 2px 3px rgba(0,0,0,.2); }
 /* tabby forehead stripes on the shell */
@@ -102,6 +106,7 @@
 <section class="scoot" aria-label="Scoot, a virtual pet cat">
   <div class="scoot-device" id="scootDevice">
     <div class="scoot-skin"></div>
+    <div class="scoot-gloss"></div>
     <div class="scoot-ring"></div>
     <div class="scoot-stripes"><i></i><i></i><i></i></div>
     <div class="scoot-brand">Scoot-a-gotchi</div>
