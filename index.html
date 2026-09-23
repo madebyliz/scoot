@@ -11,8 +11,10 @@
   /* ---------- demo page (mimics a quiet portfolio column; not part of the widget) ---------- */
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #141414; color: #f2f2f2; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 88px 24px 140px; }
+  html { overflow-x: hidden; }
+  html, body { max-width: 100%; }
+  body { margin: 0; background: #141414; color: #f2f2f2; font: 20px/1.65 -apple-system, "Inter", system-ui, sans-serif; overflow-x: hidden; }
+  main { max-width: 680px; margin: 0 auto; padding: 88px 24px 48px; overflow-x: hidden; }
   main p { margin: 0 0 28px; font-size: 16px; text-align: center; }
   main b { color: #f2f2f2; font-weight: 700; }
   .hl { font-weight: 700; text-decoration: underline; text-decoration-color: #f0964a; text-decoration-thickness: 2px; text-underline-offset: 4px; }
@@ -24,8 +26,8 @@
 /* =====================================================================
    SCOOT-A-GOTCHI  ·  drop-in widget  (CSS)   — everything is scoped to .scoot
    ===================================================================== */
-.scoot { zoom:1.45; --shell:#f0964a; --shell-hi:#ffc48a; --shell-lo:#c9652a; --lcd:#d8e3b5; --lcd-ink:#34441c;
-  display:flex; flex-direction:column; align-items:center; gap:16px; font-family:"Silkscreen", ui-monospace, monospace; -webkit-tap-highlight-color:transparent; }
+.scoot { zoom: min(1.45, calc((100vw - 48px) / 320)); --shell:#f0964a; --shell-hi:#ffc48a; --shell-lo:#c9652a; --lcd:#d8e3b5; --lcd-ink:#34441c;
+  display:flex; flex-direction:column; align-items:center; gap:16px; max-width:100%; font-family:"Silkscreen", ui-monospace, monospace; -webkit-tap-highlight-color:transparent; }
 .scoot *, .scoot *::before, .scoot *::after { box-sizing:border-box; }
 
 .scoot-device { position:relative; isolation:isolate; width:320px; height:436px; padding-top:56px;
